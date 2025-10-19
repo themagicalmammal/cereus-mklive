@@ -319,35 +319,48 @@ rk33xx_flash_uboot() {
 }
 
 set_repos() {
-# Declare base repositories url
-: "${VOID_REPO:=https://repo-default.voidlinux.org/current}"
-: "${CEREUS_REPO:=https://sourceforge.net/projects/cereus-linux/files/repos}"
+    # Declare base repositories url
+    : "${VOID_REPO:=https://repo-default.voidlinux.org/current}"
+    : "${CEREUS_REPO:=https://sourceforge.net/projects/cereus-linux/files/repos}"
 
-for _ARCH in "${HOST_ARCH}" "${TARGET_ARCH}"; do
-    case "${_ARCH}" in
-        x86_64)
-            VOID_SUBREPOS=("${VOID_REPO}"/{,{multilib{,/nonfree},nonfree}})
-            ;;
-        *-musl)
-            VOID_SUBREPOS=("${VOID_REPO}"/musl{,/nonfree})
-            ;;
-        i686)
-            VOID_SUBREPOS=("${VOID_REPO}"/{,nonfree})
-            ;;
-        aarch64)
-            VOID_SUBREPOS=("${VOID_REPO}"/{,nonfree})
-            ;;
-    esac
+    local ARCHES
+
+    if [ "${HOST_ARCH}" = "${TARGET_ARCH}" ]; then
+        ARCHES="${HOST_ARCH}"
+    else
+        ARCHES="${HOST_ARCH} ${TARGET_ARCH}"
+    fi
+
+    for _ARCH in ${ARCHES}; do
+        case "${_ARCH}" in
+            x86_64)
+                VOID_SUBREPOS=("${VOID_REPO}"/{,{multilib{,/nonfree},nonfree}})
+                ;;
+            *-musl)
+                VOID_SUBREPOS=("${VOID_REPO}"/musl{,/nonfree})
+                ;;
+            i686)
+                VOID_SUBREPOS=("${VOID_REPO}"/{,nonfree})
+                ;;
+            aarch64)
+                VOID_SUBREPOS=("${VOID_REPO}"/{,nonfree})
+                ;;
+        esac
 
     # shellcheck disable=SC2048
-    for repo in ${VOID_SUBREPOS[*]} \
-        "${CEREUS_REPO}"/cereus-{core,extra}/"${_ARCH}"; do
-            case "${_ARCH}" in
-                "${TARGET_ARCH}") TARGET_REPOSITORIES+=("--repository $repo");;
-                "${HOST_ARCH}") HOST_REPOSITORIES+=("--repository $repo");;
-            esac
+        for repo in ${VOID_SUBREPOS[*]} \
+            "${CEREUS_REPO}"/cereus-{core,extra}/"${_ARCH}"; do
+                if [ "${HOST_ARCH}" = "${TARGET_ARCH}" ]; then
+                    TARGET_REPOSITORIES+=("--repository $repo")
+                    HOST_REPOSITORIES+=("--repository $repo")
+                else
+                    case "${_ARCH}" in
+                        "${TARGET_ARCH}") TARGET_REPOSITORIES+=("--repository $repo");;
+                        "${HOST_ARCH}") HOST_REPOSITORIES+=("--repository $repo");;
+                    esac
+                fi
+        done
     done
-done
 }
 
 # This library is the authoritative source of the platform map,
