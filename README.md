@@ -16,11 +16,11 @@ The source code is mainly hosted on [Codeberg](https://codeberg.org/cereus-linux
 
 This repository contains several utilities:
 
-* [*mklive.sh*](#mklivesh) - The Cereus Linux live image generator for x86.
-* [*build-x86-images.sh*](#build-x86-imagessh) - Wrapper script to generate bootable
-  and installable live images for x86.
+* [*mklive.sh*](#mklivesh) - The Cereus Linux live image generator.
+* [*mkiso.sh*](#mkisosh) - Wrapper script to generate bootable and installable live
+  images for i686, x86_64, and aarch64.
 * [*mkrootfs.sh*](#mkrootfssh) - The Cereus Linux rootfs generator for all platforms.
-* *installer.sh* - The Cereus Linux el-cheapo installer for x86.
+* *installer.sh* - The Cereus Linux el-cheapo installer.
 
 The following utilities are inherited from *void-mklive* but are unused at the moment:
 
@@ -32,10 +32,10 @@ The following utilities are inherited from *void-mklive* but are unused at the m
 
 ### Workflow
 
-#### Generating x86 live ISOs
+#### Generating live ISOs
 
 To generate a live ISO like the officially-published ones, use
-[*build-x86-images.sh*](#build-x86-imagessh). To generate a more basic live ISO
+[*mkiso.sh*](#mkisosh). To generate a more basic live ISO
 (which does not include things like `cereus-installer`), use [*mklive.sh*](#mklivesh).
 
 #### Generating ROOTFS tarballs
@@ -82,24 +82,25 @@ that can change the behavior of the live system:
 - `locale.LANG=fr_CA.UTF-8` would set the live system's language to `fr_CA.UTF-8`
 
 ## Usage
-### build-x86-images.sh
+
+### mkiso.sh
 
 ```
-Usage: build-x86-images.sh [options ...] [-- mklive options ...]
+Usage: mkiso.sh [options ...] [-- mklive options ...]
 
 Wrapper script around mklive.sh for several standard flavors of live images.
-Adds cereus-installer and other helpful utilities to the generated images.
+Adds void-installer and other helpful utilities to the generated images.
 
 OPTIONS
- -a <arch>     Set XBPS_ARCH in the image
- -b <variant>  One of base, lxqt, xfce, cinnamon, plasma, fluxbox, or i3wm
-               (default: base). May be specified multiple times to build multiple variants
- -d <date>     Override the datestamp on the generated image (YYYY.MM.DD format)
+ -a <arch>     Set architecture (or platform) in the image
+ -b <variant>  One of base, enlightenment, xfce, mate, cinnamon, gnome, kde,
+               lxde, lxqt, or xfce-wayland (default: base). May be specified multiple times
+               to build multiple variants
+ -d <date>     Override the datestamp on the generated image (YYYYMMDD format)
  -t <arch-date-variant>
                Equivalent to setting -a, -b, and -d
  -r <repo>     Use this XBPS repository. May be specified multiple times
  -h            Show this help and exit
- -s            Set the privilege scalation package, one of sudo or doas (default: sudo).
  -V            Show version and exit
 
 Other options can be passed directly to mklive.sh by specifying them after the --.
@@ -114,7 +115,7 @@ Usage: mklive.sh [options]
 Generates a basic live ISO image of Cereus Linux. This ISO image can be written
 to a CD/DVD-ROM or any USB stick.
 
-To generate a more complete live ISO image, use build-x86-images.sh.
+To generate a more complete live ISO image, use mkiso.sh.
 
 OPTIONS
  -a <arch>          Set XBPS_ARCH in the ISO image
